@@ -14,13 +14,19 @@ export default async function suspicious(packages) {
         if(x != "") suspiciousPackages[pData.name] = x;
     });
     try{
-    let dcounts = await Promise.allSettled(Object.keys(suspiciousPackages).map(p => downloadCounts(p)));
+    let pnames = []
+    for(let p of packages){
+        pnames.push(p.name)
+    }
+    let dcounts = await Promise.allSettled(pnames.map(p => downloadCounts(p)));
     dcounts.forEach((dcount, i) => {
-        if(dcount.value.downloads < 1000)suspiciousPackages[`${dcount.value.package}`] += "L";
-        if(dcount.value.downloads > 1_000_000){ 
+        if(dcount.value.downloads < 2500)suspiciousPackages[`${dcount.value.package}`] += "L";
+        if(dcount.value.downloads > 1_000_000 && suspiciousPackages[`${dcount.value.package}`] != undefined){ 
            suspiciousPackages[`${dcount.value.package}`] = suspiciousPackages[`${dcount.value.package}`].replace(/[a-z]/g, "");
         }  
+        if(suspiciousPackages[`${dcount.value.package}`] != undefined){
         final[`${dcount.value.package}(${dcount.value.downloads})`] = suspiciousPackages[`${dcount.value.package}`];
+        }
     });
     }catch(err){
         final = suspiciousPackages;
@@ -32,7 +38,7 @@ export const suspicions = {
     "R":  "Very recent project",
     "A":  "Hasn't been updated in a while",
     "V":  "Low number of updates",
-    "L":  "Low number of downloads",
+    "L":  "Low number of monthly downloads",
     "h":  "Missing homepage",
     "r":  "Missing repository",
     "d":  "Missing description",

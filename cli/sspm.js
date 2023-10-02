@@ -7,7 +7,7 @@ import { runNpm , runTool } from "./runcli.js";
 let c = new color();
 let args = process.argv.slice(2);
 let config = {
-    version: "1.1.0",
+    version: "1.2.0",
     pm: null,
     baseURL: "https://registry.npmjs.org"
 };
